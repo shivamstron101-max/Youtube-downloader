@@ -17,12 +17,14 @@ export const POST = async ({ request }) => {
 
     const isAudio = downloadMode === 'audio';
 
-    let format = isAudio ? 'bestaudio[ext=m4a]/bestaudio/best' : 'bestvideo[ext=mp4]+bestaudio[ext=m4a]/best[ext=mp4]/best';
+    let format = isAudio 
+      ? 'bestaudio[ext=m4a]/bestaudio/best' 
+      : 'bestvideo[vcodec^=avc1][ext=mp4]+bestaudio[ext=m4a]/bestvideo[ext=mp4]+bestaudio[ext=m4a]/best[ext=mp4]/best';
     
     if (isAudio && audioBitrate) {
       format = `bestaudio[abr<=${audioBitrate}][ext=m4a]/bestaudio[ext=m4a]/bestaudio/best`;
     } else if (!isAudio && videoQuality && videoQuality !== 'max') {
-      format = `bestvideo[height<=${videoQuality}][ext=mp4]+bestaudio[ext=m4a]/best[height<=${videoQuality}][ext=mp4]/best`;
+      format = `bestvideo[height<=${videoQuality}][vcodec^=avc1][ext=mp4]+bestaudio[ext=m4a]/bestvideo[height<=${videoQuality}][ext=mp4]+bestaudio[ext=m4a]/best[height<=${videoQuality}][ext=mp4]/best`;
     }
 
     const ytDlpPath = path.join(process.cwd(), 'node_modules', 'youtube-dl-exec', 'bin', 'yt-dlp');
@@ -39,9 +41,9 @@ export const POST = async ({ request }) => {
     
     const args = [
       '--no-warnings',
-      '--no-call-home',
       '--no-check-certificate',
-      '--youtube-skip-dash-manifest',
+      '--js-runtimes',
+      'node',
       '--format',
       format,
       '-o',

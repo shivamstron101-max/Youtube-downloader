@@ -146,12 +146,7 @@ const faqSchema = {
         <span id="error-text">Something went wrong. Try again.</span>
       </div>
 
-      <!-- Video Preview -->
-      <div id="video-preview-container" class="hidden mt-6 w-full rounded-md overflow-hidden border border-hairline bg-canvas-soft shadow-[0_2px_8px_#0000000a]">
-        <div class="relative w-full pt-[56.25%]">
-          <iframe id="video-preview-iframe" class="absolute top-0 left-0 w-full h-full" src="" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
-        </div>
-      </div>
+
     </div>
   </div>
 
@@ -316,33 +311,13 @@ const faqSchema = {
       const text = await navigator.clipboard.readText();
       if (text && (text.includes('youtube') || text.includes('youtu.be'))) {
         document.getElementById('url-input').value = text.trim();
-        updateVideoPreview();
       }
     } catch(e) {
       document.getElementById('url-input').focus();
     }
   }
 
-  function updateVideoPreview() {
-    const url = document.getElementById('url-input').value.trim();
-    const videoId = extractYouTubeID(url);
-    const container = document.getElementById('video-preview-container');
-    const iframe = document.getElementById('video-preview-iframe');
 
-    if (videoId) {
-      iframe.src = `https://www.youtube.com/embed/${videoId}`;
-      container.classList.remove('hidden');
-    } else {
-      container.classList.add('hidden');
-      iframe.src = '';
-    }
-  }
-
-  function extractYouTubeID(url) {
-    const regExp = /^.*(youtu\.be\/|v\/|u\/\w\/|embed\/|watch\?v=|\&v=)([^#\&\?]*).*/;
-    const match = url.match(regExp);
-    return (match && match[2].length === 11) ? match[2] : null;
-  }
 
   function hideStatus() {
     document.getElementById('status-loading').classList.add('hidden');
@@ -446,7 +421,6 @@ const faqSchema = {
   });
   document.getElementById('url-input').addEventListener('input', () => {
     hideStatus();
-    updateVideoPreview();
   });
 
   // Initialize correct mode on load
