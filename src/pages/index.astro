@@ -1,0 +1,454 @@
+---
+import Layout from '../layouts/Layout.astro';
+
+const faqs = [
+  { question: "Is YT Downloader free to use?", answer: "Yes, completely free. No account, no subscription, no hidden charges." },
+  { question: "What video qualities are available?", answer: "You can download up to 1080p Full HD for video. For audio, up to 320kbps MP3." },
+  { question: "Does this work on mobile (iPhone/Android)?", answer: "Yes. Open your browser, paste the link, and tap Download. Some browsers may need you to long-press the file link to save it." },
+  { question: "Is downloading YouTube videos legal?", answer: "This depends on your country and intended use. Downloading for personal, offline use is generally tolerated, but redistributing downloaded content is not. Always respect creators and copyright law." },
+  { question: "How to download a YouTube video by link?", answer: "Simply copy the YouTube video link, paste it into our downloader input box, select your preferred video quality or MP4 format, and click the Download button. The video will be processed and downloaded to your device instantly." },
+  { question: "Can I download 4K videos from YouTube legally?", answer: "Downloading 4K videos from YouTube for personal, offline viewing is generally considered acceptable under fair use, but distributing or using them for commercial purposes without permission is against copyright laws. Always check local regulations." },
+  { question: "Can I download videos from a link?", answer: "Yes! Our platform is designed precisely for this. Just paste any valid video link into the search bar, and our system will extract the media so you can download it directly to your computer or smartphone." },
+  { question: "How to download MP3 audio for free?", answer: "To download MP3 audio, paste the video URL into our tool, select the 'Audio (MP3)' format tab, choose your desired bitrate quality, and click Download. It's 100% free and requires no registration." },
+  { question: "what is the best youtube downloader", answer: "The best YouTube downloader is one that is fast, free, requires no software installation, and does not serve intrusive ads. Our platform is optimized to provide the highest quality downloads securely and quickly, making it the top choice for users." },
+  { question: "is youtube downloader safe", answer: "Yes, our YouTube downloader is completely safe. We do not require any software installations or browser extensions, meaning there's zero risk of malware. We also do not track or store your download history." },
+  { question: "what is the best free youtube downloader", answer: "Our website stands as the best free YouTube downloader because it offers unlimited downloads without paywalls, supports multiple formats including MP4 and MP3, and works seamlessly across all devices without requiring an account." },
+  { question: "how to download videos from youtube downloader", answer: "Paste the YouTube video URL into our downloader's input field, choose your desired format (Video or Audio) and quality settings, then hit the 'Download Now' button. Your file will be ready to save in seconds." },
+  { question: "what youtube downloader is safe", answer: "A safe YouTube downloader is a web-based tool that uses HTTPS, doesn't require you to download executable files (.exe), and is free from pop-up ads. Our tool meets all these criteria, ensuring a 100% secure downloading experience." },
+  { question: "what is the best youtube to mp3 downloader", answer: "For converting YouTube to MP3, our platform is the best option. It provides high-fidelity audio extraction up to 320kbps, works instantly in your browser, and is entirely free of charge with no hidden limitations." },
+  { question: "How do I convert YouTube to MP3 for free?", answer: "Copy the YouTube video link, paste it into our converter, switch the format tab to 'Audio (MP3)', and click download. Our servers will extract the audio and provide you with a high-quality MP3 file for free." },
+  { question: "Is using a YouTube to MP3 downloader safe?", answer: "Using our web-based YouTube to MP3 downloader is perfectly safe. Since the conversion happens on our secure servers and you only download standard audio files (.mp3), your device is protected from viruses and malware." },
+  { question: "How to save MP3 from YouTube to Android phone?", answer: "Open your Android's web browser (like Chrome), go to our site, paste the YouTube link, select MP3 format, and tap download. The MP3 file will be saved directly to your phone's 'Downloads' folder." },
+  { question: "Is it legal to convert YouTube videos to MP3?", answer: "Converting YouTube videos to MP3 for your own personal, non-commercial use is generally tolerated. However, downloading copyrighted music to distribute or sell is illegal. Always use downloaded content responsibly." },
+  { question: "What is the best app to download free music from YouTube?", answer: "You don't need a dedicated app! The best way is to use our responsive web-based downloader directly from your phone or computer browser. It saves storage space, avoids app store restrictions, and is completely free." }
+];
+
+const faqSchema = {
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  "mainEntity": faqs.map(faq => ({
+    "@type": "Question",
+    "name": faq.question,
+    "acceptedAnswer": {
+      "@type": "Answer",
+      "text": faq.answer
+    }
+  }))
+};
+---
+
+<Layout title="YT Downloader — Download YouTube Videos & MP3s Free" description="Paste any YouTube link and download it as MP4 video or MP3 audio instantly. Free, fast, no signup." keywords="Youtube Downloader, youtube downloader online, youtube downloader 4k, youtube downloader mp3, free youtube downloader, youtube downloader mp4, online youtube downloader, best youtube downloader, youtube downloader mac, youtube downloader reddit, youtube downloader safe, youtube downloader free, youtube downloader for mac, 4k youtube downloader, mp3 youtube downloader, youtube downloader video">
+  <!-- Mesh Gradient Background -->
+  <div class="fixed inset-0 overflow-hidden pointer-events-none -z-10">
+    <div class="absolute top-[-20%] left-[-10%] w-[600px] h-[600px] rounded-full bg-gradient-develop-start/20 blur-[100px]"></div>
+    <div class="absolute top-[20%] right-[-10%] w-[500px] h-[500px] rounded-full bg-gradient-preview-start/10 blur-[100px]"></div>
+    <div class="absolute bottom-[-10%] left-[20%] w-[700px] h-[700px] rounded-full bg-gradient-ship-start/15 blur-[120px]"></div>
+  </div>
+
+  <div class="max-w-[1400px] mx-auto px-4 sm:px-6 lg:px-8 py-12 sm:py-24 lg:py-32 relative z-10 flex flex-col items-center">
+    
+    <!-- Hero Section -->
+    <div class="text-center max-w-4xl mb-16">
+      <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-canvas-soft border border-hairline text-xs font-mono text-mute mb-6 uppercase tracking-widest">
+        <span class="w-2 h-2 rounded-full bg-success animate-pulse"></span>
+        Free · No Signup
+      </div>
+      <h1 class="text-4xl md:text-5xl lg:text-[64px] font-semibold text-ink leading-tight tracking-[-2.4px] mb-6">
+        Download <span class="bg-clip-text text-transparent bg-gradient-to-r from-gradient-develop-start to-gradient-preview-end">YouTube</span> Videos<br />
+        in seconds.
+      </h1>
+      <p class="text-lg sm:text-xl text-body mb-8 max-w-2xl mx-auto leading-relaxed">
+        Paste any YouTube link and get your video or MP3 file instantly. No extensions, no account — just paste and download.
+      </p>
+    </div>
+
+    <!-- Downloader Card -->
+    <div class="w-full max-w-4xl bg-canvas border border-hairline rounded-xl shadow-[0_2px_2px_#0000000a,0_8px_16px_-4px_#0000000a] p-6 sm:p-8 relative overflow-hidden">
+      <!-- Top edge highlight -->
+      <div class="absolute top-0 left-0 right-0 h-[2px] bg-gradient-to-r from-gradient-develop-start via-gradient-preview-start to-gradient-ship-end"></div>
+
+      <!-- Format Tabs -->
+      <div class="flex gap-2 p-1 bg-canvas-soft rounded-lg mb-6 border border-hairline/50">
+        <button id="tab-video" class="flex-1 py-2 text-sm font-medium rounded-md bg-canvas text-ink shadow-[0_1px_1px_#0000000a] border border-hairline transition-all flex items-center justify-center gap-2 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary" onclick="setMode('video')">
+          <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><rect x="2" y="3" width="20" height="14" rx="2"/><polyline points="8 21 16 21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>
+          Video (MP4)
+        </button>
+        <button id="tab-audio" class="flex-1 py-2 text-sm font-medium rounded-md text-body hover:text-ink transition-all flex items-center justify-center gap-2 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary" onclick="setMode('audio')">
+          <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/></svg>
+          Audio (MP3)
+        </button>
+      </div>
+
+      <!-- Input Row -->
+      <div class="flex flex-col sm:flex-row gap-3 mb-4">
+        <div class="relative flex-1">
+          <input
+            type="url"
+            id="url-input"
+            class="w-full h-[48px] bg-canvas border border-hairline rounded-md px-4 text-base text-ink placeholder:text-mute focus:border-primary focus:ring-1 focus:ring-primary focus:outline-none transition-all"
+            placeholder="https://www.youtube.com/watch?v=..."
+            autocomplete="off"
+            autocorrect="off"
+            spellcheck="false"
+          />
+        </div>
+        <button id="paste-btn" class="h-[48px] px-5 bg-canvas-soft border border-hairline rounded-md text-ink text-sm font-medium hover:bg-hairline transition-colors flex items-center justify-center gap-2 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary whitespace-nowrap" onclick="pasteUrl()" title="Paste from clipboard">
+          <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/><rect x="8" y="2" width="8" height="4" rx="1" ry="1"/></svg>
+          Paste
+        </button>
+      </div>
+
+      <!-- Options Row -->
+      <div class="mb-6 relative">
+        <select id="quality-select" class="w-full h-[40px] bg-canvas border border-hairline rounded-md px-4 text-sm text-ink appearance-none focus:border-primary focus:ring-1 focus:ring-primary focus:outline-none cursor-pointer">
+          <option value="1080">1080p Full HD</option>
+          <option value="720">720p HD</option>
+          <option value="480">480p</option>
+          <option value="360">360p</option>
+          <option value="max">Max Quality</option>
+        </select>
+        <select id="audio-quality-select" class="w-full h-[40px] bg-canvas border border-hairline rounded-md px-4 text-sm text-ink appearance-none focus:border-primary focus:ring-1 focus:ring-primary focus:outline-none cursor-pointer hidden">
+          <option value="320">320 kbps (Best)</option>
+          <option value="256">256 kbps</option>
+          <option value="128">128 kbps</option>
+          <option value="64">64 kbps</option>
+        </select>
+        <div class="absolute inset-y-0 right-0 flex items-center px-4 pointer-events-none">
+          <svg class="w-4 h-4 text-mute" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7" /></svg>
+        </div>
+      </div>
+
+      <!-- Download Action -->
+      <button id="dl-btn" class="w-full h-[48px] bg-primary text-on-primary rounded-full text-base font-medium flex items-center justify-center gap-2 hover:bg-ink/90 transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed" onclick="startDownload()">
+        <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/></svg>
+        Download Now
+      </button>
+
+      <!-- Status Areas -->
+      <div id="status-loading" class="hidden mt-6 p-4 rounded-md bg-canvas-soft border border-hairline flex items-center justify-center gap-3 text-sm text-body">
+        <svg class="w-4 h-4 animate-spin text-mute" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" /></svg>
+        <span id="status-text">Fetching your file…</span>
+      </div>
+
+      <div id="status-success" class="hidden mt-6 p-4 rounded-md bg-[#f0f9ff] border border-[#b9e6fe] flex flex-col items-start gap-3">
+        <div class="flex items-center gap-2 text-[#026aa2] text-sm font-medium">
+          <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>
+          Ready! Your download link is below.
+        </div>
+        <a id="result-link" href="#" target="_blank" rel="noopener" class="inline-flex items-center gap-2 bg-[#026aa2] text-white px-5 py-2.5 rounded-full text-sm font-medium hover:bg-[#035482] transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#026aa2] focus-visible:ring-offset-2">
+          <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/></svg>
+          <span id="result-link-text">Click to Download</span>
+        </a>
+      </div>
+
+      <div id="status-error" class="hidden mt-6 p-4 rounded-md bg-error-soft border border-[#fecaca] flex items-center gap-3 text-error-deep text-sm font-medium">
+        <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+        <span id="error-text">Something went wrong. Try again.</span>
+      </div>
+
+      <!-- Video Preview -->
+      <div id="video-preview-container" class="hidden mt-6 w-full rounded-md overflow-hidden border border-hairline bg-canvas-soft shadow-[0_2px_8px_#0000000a]">
+        <div class="relative w-full pt-[56.25%]">
+          <iframe id="video-preview-iframe" class="absolute top-0 left-0 w-full h-full" src="" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Features Grid -->
+  <div class="max-w-[1400px] mx-auto px-4 sm:px-6 py-12 sm:py-24 w-full">
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+      <div class="bg-canvas border border-hairline rounded-md p-6 shadow-[0_1px_1px_#00000005,0_2px_2px_#0000000a] hover:border-hairline-strong transition-colors">
+        <div class="w-10 h-10 rounded-full bg-canvas-soft border border-hairline flex items-center justify-center text-ink mb-4">
+          <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
+        </div>
+        <h3 class="text-base font-semibold text-ink mb-2">Lightning fast</h3>
+        <p class="text-sm text-body">Most downloads are ready in under 5 seconds. No waiting, no queues.</p>
+      </div>
+      <div class="bg-canvas border border-hairline rounded-md p-6 shadow-[0_1px_1px_#00000005,0_2px_2px_#0000000a] hover:border-hairline-strong transition-colors">
+        <div class="w-10 h-10 rounded-full bg-canvas-soft border border-hairline flex items-center justify-center text-ink mb-4">
+          <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+        </div>
+        <h3 class="text-base font-semibold text-ink mb-2">Private & secure</h3>
+        <p class="text-sm text-body">We don't store your downloads or track your activity. Ever.</p>
+      </div>
+      <div class="bg-canvas border border-hairline rounded-md p-6 shadow-[0_1px_1px_#00000005,0_2px_2px_#0000000a] hover:border-hairline-strong transition-colors">
+        <div class="w-10 h-10 rounded-full bg-canvas-soft border border-hairline flex items-center justify-center text-ink mb-4">
+          <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg>
+        </div>
+        <h3 class="text-base font-semibold text-ink mb-2">Multiple formats</h3>
+        <p class="text-sm text-body">MP4 up to 1080p for video, or MP3 up to 320kbps for pure audio.</p>
+      </div>
+      <div class="bg-canvas border border-hairline rounded-md p-6 shadow-[0_1px_1px_#00000005,0_2px_2px_#0000000a] hover:border-hairline-strong transition-colors">
+        <div class="w-10 h-10 rounded-full bg-canvas-soft border border-hairline flex items-center justify-center text-ink mb-4">
+          <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5"><rect x="5" y="2" width="14" height="20" rx="2" ry="2"/><line x1="12" y1="18" x2="12.01" y2="18"/></svg>
+        </div>
+        <h3 class="text-base font-semibold text-ink mb-2">Works on mobile</h3>
+        <p class="text-sm text-body">No app needed. Open your browser, paste the link, done.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- How it works -->
+  <div id="how-it-works" class="bg-canvas border-y border-hairline py-12 sm:py-24 w-full">
+    <div class="max-w-4xl mx-auto px-4 sm:px-6">
+      <h2 class="text-3xl md:text-4xl font-semibold tracking-[-1.28px] text-ink mb-12 text-center">How it works.</h2>
+      
+      <div class="flex flex-col gap-6">
+        <div class="flex items-start gap-4 p-6 rounded-md bg-canvas-soft border border-hairline">
+          <div class="w-8 h-8 rounded-full bg-primary text-on-primary flex items-center justify-center font-semibold text-sm shrink-0">1</div>
+          <div>
+            <h3 class="text-base font-semibold text-ink mb-1">Copy the YouTube link</h3>
+            <p class="text-sm text-body">Go to the YouTube video you want, tap the Share button, and copy the link.</p>
+          </div>
+        </div>
+        <div class="flex items-start gap-4 p-6 rounded-md bg-canvas-soft border border-hairline">
+          <div class="w-8 h-8 rounded-full bg-primary text-on-primary flex items-center justify-center font-semibold text-sm shrink-0">2</div>
+          <div>
+            <h3 class="text-base font-semibold text-ink mb-1">Paste it above</h3>
+            <p class="text-sm text-body">Click the Paste button or paste directly into the input box at the top of the page.</p>
+          </div>
+        </div>
+        <div class="flex items-start gap-4 p-6 rounded-md bg-canvas-soft border border-hairline">
+          <div class="w-8 h-8 rounded-full bg-primary text-on-primary flex items-center justify-center font-semibold text-sm shrink-0">3</div>
+          <div>
+            <h3 class="text-base font-semibold text-ink mb-1">Pick your format</h3>
+            <p class="text-sm text-body">Choose Video (MP4) or Audio (MP3), select quality, and hit Download Now.</p>
+          </div>
+        </div>
+        <div class="flex items-start gap-4 p-6 rounded-md bg-canvas-soft border border-hairline">
+          <div class="w-8 h-8 rounded-full bg-primary text-on-primary flex items-center justify-center font-semibold text-sm shrink-0">4</div>
+          <div>
+            <h3 class="text-base font-semibold text-ink mb-1">Save the file</h3>
+            <p class="text-sm text-body">Click the download link that appears, and your browser will save the file directly.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- FAQ -->
+  <div id="faq" class="max-w-4xl mx-auto px-4 sm:px-6 py-12 sm:py-24 w-full">
+    <h2 class="text-3xl md:text-4xl font-semibold tracking-[-1.28px] text-ink mb-12 text-center">Frequently asked questions.</h2>
+    
+    <div class="flex flex-col border-t border-hairline">
+      <!-- FAQ Items -->
+      {faqs.map((faq) => (
+        <details class="group border-b border-hairline">
+          <summary class="flex justify-between items-center font-medium cursor-pointer list-none py-5 text-ink text-base hover:text-primary transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary rounded-sm">
+            <span>{faq.question}</span>
+            <span class="transition group-open:rotate-180">
+              <svg fill="none" height="24" shape-rendering="geometricPrecision" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" viewBox="0 0 24 24" width="24"><path d="M6 9l6 6 6-6"></path></svg>
+            </span>
+          </summary>
+          <p class="text-body mt-2 mb-5 text-sm">
+            {faq.answer}
+          </p>
+        </details>
+      ))}
+    </div>
+  </div>
+
+  <!-- SEO Article -->
+  <div class="max-w-4xl mx-auto px-4 sm:px-6 py-16 sm:py-24 border-t border-hairline w-full">
+    <div class="text-sm sm:text-base text-body space-y-4">
+      <h2 class="text-2xl font-semibold tracking-tight text-ink mb-6">The Ultimate YouTube Downloader for All Your Media Needs</h2>
+      <p>
+        Welcome to the absolute <strong>best YouTube downloader</strong> available on the internet today. In a world where digital video content is king, having a reliable and <strong>free YouTube downloader</strong> is absolutely essential. Whether you are looking to save a detailed tech tutorial, a trending music video, an insightful documentary, or a funny clip for offline viewing, our web-based tool provides a seamless and frictionless experience. Our <strong>YouTube downloader online</strong> service is meticulously designed to give you exactly what you need without any of the typical internet hassle. We prioritize speed, simplicity, and superior quality above all else.
+      </p>
+
+      <h3 class="text-xl font-semibold text-ink mt-8 mb-4">Why Choose Our Online YouTube Downloader?</h3>
+      <p>
+        There are countless software options and websites out there, but our platform consistently stands out as a highly trusted and <strong>youtube downloader safe</strong> choice. We pride ourselves on offering an entirely secure, ad-free, and <strong>free YouTube downloader</strong> that requires zero software installations, no browser extensions, and absolutely no user sign-ups. Many internet users often search for a <strong>youtube downloader reddit</strong> recommends, as the Reddit community is known for its rigorous standards regarding privacy and efficiency. We constantly strive to meet and exceed those community standards, ensuring that our service is devoid of malware, tracking, and annoying pop-ups.
+      </p>
+      <p>
+        Unlike other platforms that bombard you with deceptive download buttons and complicated multi-step processes, our <strong>online YouTube downloader</strong> is incredibly straightforward. Just copy your link, paste it into our clean interface, and you can instantly get your favorite <strong>youtube downloader video</strong> saved locally in a matter of seconds.
+      </p>
+
+      <h3 class="text-xl font-semibold text-ink mt-8 mb-4">High-Quality Video and Audio: 4K and MP3 Support</h3>
+      <p>
+        Visual and audio quality matters immensely when it comes to saving and archiving your favorite media. That is precisely why we offer a top-tier <strong>youtube downloader 4k</strong> option, ensuring that you can save videos in crisp, ultra-high definition. As modern displays improve, the demand for a true <strong>4k youtube downloader</strong> is higher than ever, and we ensure that our backend engine captures the maximum resolution available directly from the source.
+      </p>
+      <p>
+        Prefer to just listen on the go? Our robust service doubles as an excellent <strong>youtube downloader mp3</strong> converter. You can effortlessly extract and convert any video into a high-quality audio file for your playlists. If you are specifically looking for an <strong>mp3 youtube downloader</strong> that captures audio at up to 320kbps bitrate for crystal-clear studio sound, you are in the right place. Additionally, if standard video is what you are after, our native <strong>youtube downloader mp4</strong> functionality ensures perfect playback compatibility on almost any device—from smartphones and tablets to smart TVs.
+      </p>
+
+      <h3 class="text-xl font-semibold text-ink mt-8 mb-4">Perfect Compatibility: YouTube Downloader for Mac, PC, and Mobile</h3>
+      <p>
+        One of the main frustrations everyday users face is finding a tool that works universally across all modern operating systems. Our web-based platform acts as the perfect <strong>youtube downloader mac</strong> and PC solution. Because it operates entirely within your web browser, there is absolutely no need to install shady or unverified desktop software. It functions flawlessly as a native-feeling <strong>youtube downloader for mac</strong>, Windows, Linux, Android, and iOS devices. You get a seamless, universal, and responsive experience every single time you use our <strong>youtube downloader free</strong> tool.
+      </p>
+
+      <h3 class="text-xl font-semibold text-ink mt-8 mb-4">Experience the Best YouTube Downloader Today</h3>
+      <p>
+        To summarize, our dedicated platform provides a lightning-fast, impeccably clean, and definitively <strong>youtube downloader safe</strong> environment for everyone. By combining an elegant, intuitive interface with powerful under-the-hood features—such as our comprehensive <strong>youtube downloader mp4</strong> capabilities, uncompressed <strong>youtube downloader 4k</strong> resolution support, and a seamlessly responsive <strong>youtube downloader online</strong> experience—we aim to be the definitive choice for all your personal media saving needs. Stop compromising with slow, ad-heavy, and restrictive sites. Start utilizing the very <strong>best youtube downloader</strong> right now. Enjoy completely unrestricted access to a <strong>youtube downloader free</strong> of hidden catches, trial limits, or paywalls, and build your perfect offline media library effortlessly today!
+      </p>
+    </div>
+  </div>
+
+  <script type="application/ld+json" set:html={JSON.stringify(faqSchema)} />
+</Layout>
+
+<script is:inline>
+  let currentMode = 'video';
+
+
+  function setMode(mode) {
+    currentMode = mode;
+    const tabVideo = document.getElementById('tab-video');
+    const tabAudio = document.getElementById('tab-audio');
+    
+    if (mode === 'video') {
+      tabVideo.className = 'flex-1 py-2 text-sm font-medium rounded-md bg-canvas text-ink shadow-[0_1px_1px_#0000000a] border border-hairline transition-all flex items-center justify-center gap-2 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary';
+      tabAudio.className = 'flex-1 py-2 text-sm font-medium rounded-md text-body hover:text-ink transition-all flex items-center justify-center gap-2 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary';
+      document.getElementById('quality-select').classList.remove('hidden');
+      document.getElementById('audio-quality-select').classList.add('hidden');
+    } else {
+      tabAudio.className = 'flex-1 py-2 text-sm font-medium rounded-md bg-canvas text-ink shadow-[0_1px_1px_#0000000a] border border-hairline transition-all flex items-center justify-center gap-2 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary';
+      tabVideo.className = 'flex-1 py-2 text-sm font-medium rounded-md text-body hover:text-ink transition-all flex items-center justify-center gap-2 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary';
+      document.getElementById('audio-quality-select').classList.remove('hidden');
+      document.getElementById('quality-select').classList.add('hidden');
+    }
+    hideStatus();
+  }
+
+  async function pasteUrl() {
+    try {
+      const text = await navigator.clipboard.readText();
+      if (text && (text.includes('youtube') || text.includes('youtu.be'))) {
+        document.getElementById('url-input').value = text.trim();
+        updateVideoPreview();
+      }
+    } catch(e) {
+      document.getElementById('url-input').focus();
+    }
+  }
+
+  function updateVideoPreview() {
+    const url = document.getElementById('url-input').value.trim();
+    const videoId = extractYouTubeID(url);
+    const container = document.getElementById('video-preview-container');
+    const iframe = document.getElementById('video-preview-iframe');
+
+    if (videoId) {
+      iframe.src = `https://www.youtube.com/embed/${videoId}`;
+      container.classList.remove('hidden');
+    } else {
+      container.classList.add('hidden');
+      iframe.src = '';
+    }
+  }
+
+  function extractYouTubeID(url) {
+    const regExp = /^.*(youtu\.be\/|v\/|u\/\w\/|embed\/|watch\?v=|\&v=)([^#\&\?]*).*/;
+    const match = url.match(regExp);
+    return (match && match[2].length === 11) ? match[2] : null;
+  }
+
+  function hideStatus() {
+    document.getElementById('status-loading').classList.add('hidden');
+    document.getElementById('status-success').classList.add('hidden');
+    document.getElementById('status-error').classList.add('hidden');
+  }
+
+  function showLoading(msg) {
+    hideStatus();
+    document.getElementById('status-text').textContent = msg || 'Fetching your file…';
+    document.getElementById('status-loading').classList.remove('hidden');
+  }
+
+  function showSuccess(url, filename) {
+    hideStatus();
+    const link = document.getElementById('result-link');
+    link.href = url;
+    link.setAttribute('download', filename || 'download');
+    document.getElementById('result-link-text').textContent = 'Click to Download — ' + (filename || 'file');
+    document.getElementById('status-success').classList.remove('hidden');
+  }
+
+  function showError(msg) {
+    hideStatus();
+    document.getElementById('error-text').textContent = msg || 'Something went wrong. Please try again.';
+    document.getElementById('status-error').classList.remove('hidden');
+  }
+
+  async function startDownload() {
+    const url = document.getElementById('url-input').value.trim();
+    if (!url) { showError('Please paste a YouTube link first.'); return; }
+    if (!url.includes('youtube.com') && !url.includes('youtu.be')) {
+      showError('That doesn\'t look like a YouTube link. Please check and try again.');
+      return;
+    }
+
+    const btn = document.getElementById('dl-btn');
+    btn.disabled = true;
+    showLoading('Contacting download server…');
+
+    const body = {
+      url: url,
+      downloadMode: currentMode === 'audio' ? 'audio' : 'auto',
+      filenameStyle: 'pretty',
+    };
+
+    if (currentMode === 'video') {
+      body.videoQuality = document.getElementById('quality-select').value;
+      body.youtubeVideoCodec = 'h264';
+      body.youtubeVideoContainer = 'mp4';
+    } else {
+      body.audioFormat = 'mp3';
+      body.audioBitrate = document.getElementById('audio-quality-select').value;
+    }
+
+    try {
+      showLoading('Processing your request…');
+
+      const res = await fetch('/api/download', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Accept': 'application/json',
+        },
+        body: JSON.stringify(body),
+      });
+
+      const data = await res.json();
+
+      if (data.status === 'tunnel' || data.status === 'redirect') {
+        showSuccess(data.url, data.filename);
+      } else if (data.status === 'error') {
+        const code = data.error?.code || 'unknown';
+        if (code.includes('content.too_long')) showError('This video is too long to download.');
+        else if (code.includes('fetch.fail')) showError('Could not fetch the video. It may be private or age-restricted.');
+        else if (code.includes('rate_limit')) showError('Too many requests. Please wait a moment and try again.');
+        else showError('Error: ' + code);
+      } else if (data.status === 'picker') {
+        if (data.picker && data.picker[0]) {
+          showSuccess(data.picker[0].url, 'download');
+        } else {
+          showError('Could not process this link. Try a direct video URL.');
+        }
+      } else {
+        showError('Unexpected response. Please try again in a moment.');
+      }
+
+    } catch (err) {
+      if (err.message && err.message.includes('Failed to fetch')) {
+        showError('Could not reach the download server. You might be ad-blocked or the API is down.');
+      } else {
+        showError('Network error: ' + err.message);
+      }
+    } finally {
+      btn.disabled = false;
+    }
+  }
+
+  document.getElementById('url-input').addEventListener('keydown', e => {
+    if (e.key === 'Enter') startDownload();
+  });
+  document.getElementById('url-input').addEventListener('input', () => {
+    hideStatus();
+    updateVideoPreview();
+  });
+
+  // Initialize correct mode on load
+  setMode('video');
+</script>
