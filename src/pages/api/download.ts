@@ -11,15 +11,26 @@ export const POST = async ({ request }) => {
     const isAudio = downloadMode === 'audio';
 
     // Use Cobalt API for downloading
+    // Cobalt expects video quality as a number (e.g., 1080, 720)
+    const cobaltBody: any = {
+      url: url,
+      isAudioOnly: isAudio,
+    };
+    
+    if (!isAudio && videoQuality && videoQuality !== 'max') {
+      // Extract number from quality like "1080" from "1080p Full HD"
+      const qualityNum = parseInt(videoQuality.replace(/\D/g, ''));
+      if (qualityNum) {
+        cobaltBody.vQuality = qualityNum.toString();
+      }
+    }
+    
     const cobaltResponse = await fetch('https://cobalt.tools/api/download', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
       },
-      body: JSON.stringify({
-        url: url,
-        isAudioOnly: isAudio,
-      }),
+      body: JSON.stringify(cobaltBody),
     });
 
     const data = await cobaltResponse.json();
