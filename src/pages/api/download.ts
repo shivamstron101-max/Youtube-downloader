@@ -18,73 +18,65 @@ export const POST = async ({ request }) => {
 
     const isAudio = downloadMode === 'audio';
 
-    let format = isAudio 
-      ? 'bestaudio[ext=m4a]/bestaudio/best' 
-      : 'bestvideo[vcodec^=avc1][ext=mp4]+bestaudio[ext=m4a]/bestvideo[ext=mp4]+bestaudio[ext=m4a]/best[ext=mp4]/best';
+    // Use Cobalt API for downloading
+    // Cobalt expects video quality as a number (e.g., 1080, 720)
+    const cobaltBody: any = {
+      url: url,
+      isAudioOnly: isAudio,
+    };
     
-    if (isAudio && audioBitrate) {
-      format = `bestaudio[abr<=${audioBitrate}][ext=m4a]/bestaudio[ext=m4a]/bestaudio/best`;
-    } else if (!isAudio && videoQuality && videoQuality !== 'max') {
-      format = `bestvideo[height<=${videoQuality}][vcodec^=avc1][ext=mp4]+bestaudio[ext=m4a]/bestvideo[height<=${videoQuality}][ext=mp4]+bestaudio[ext=m4a]/best[height<=${videoQuality}][ext=mp4]/best`;
-    }
-
-    const ytDlpPath = path.join(process.cwd(), 'node_modules', 'youtube-dl-exec', 'bin', 'yt-dlp');
-    const downloadsDir = path.join(process.cwd(), 'public', 'downloads');
-    
-    if (!fs.existsSync(downloadsDir)) {
-      fs.mkdirSync(downloadsDir, { recursive: true });
-    }
-
-    const uniqueId = crypto.randomBytes(8).toString('hex');
-    const extension = isAudio ? 'mp3' : 'mp4';
-    const filename = `download-${uniqueId}.${extension}`;
-    const outputPath = path.join(downloadsDir, filename);
-    
-    const args = [
-      '--no-warnings',
-      '--no-check-certificate',
-      '--js-runtimes',
-      'node',
-      ...(ffmpegStatic ? ['--ffmpeg-location', ffmpegStatic] : []),
-      '--format',
-      format,
-      '-o',
-      outputPath,
-      url
-    ];
-
-    if (isAudio) {
-      args.push('--extract-audio', '--audio-format', 'mp3');
-      if (audioBitrate) {
-        args.push('--audio-quality', `${audioBitrate}K`);
+    if (!isAudio && videoQuality && videoQuality !== 'max') {
+      // Extract number from quality like "1080" from "1080p Full HD"
+      const qualityNum = parseInt(videoQuality.replace(/\D/g, ''));
+      if (qualityNum) {
+        cobaltBody.vQuality = qualityNum.toString();
       }
-    } else {
-      args.push('--merge-output-format', 'mp4');
+    }
+    
+    const cobaltResponse = await fetch('https://cobalt.tools/api/download', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Accept': 'application/json',
+      },
+      body: JSON.stringify(cobaltBody),
+    });
+
+    const data = await cobaltResponse.json();
+
+    if (data.error) {
+      console.error('Cobalt error:', data.error);
+      return new Response(JSON.stringify({ status: 'error', error: { code: 'error.api.content.video.unavailable' } }), { status: 500 });
     }
 
-    // Bypass YouTube bot detection by using ios/android client
-    args.push('--extractor-args', 'youtube:player_client=ios,android');
-    args.push('--print', 'title', '--no-simulate');
+    // Cobalt returns different response structures depending on the media type
+    let downloadUrl = data.url;
+    let filename = data.filename || 'download';
 
-    const { stdout } = await execFileAsync(ytDlpPath, args);
-    const title = stdout.trim().split('\n').pop() || 'download';
-    const sanitizedTitle = title.replace(/[/\\?%*:|"<>]/g, '-');
-    const finalFilename = `${sanitizedTitle}.${extension}`;
+    // Handle nested response structures
+    if (!downloadUrl && data.data) {
+      downloadUrl = data.data.url || data.data[0]?.url;
+      filename = data.data.filename || filename;
+    }
 
+    if (!downloadUrl) {
+      console.error('No download URL found in Cobalt response');
+      return new Response(JSON.stringify({ status: 'error', error: { code: 'error.api.content.video.unavailable' } }), { status: 500 });
+    }
+
+    // Return the URL for the frontend to handle directly
     return new Response(JSON.stringify({
-      status: 'tunnel',
-      url: `/api/serve?file=${encodeURIComponent(filename)}&title=${encodeURIComponent(finalFilename)}`,
-      filename: finalFilename
+      status: 'redirect',
+      url: downloadUrl,
+      filename: filename
     }), { status: 200, headers: { 'Content-Type': 'application/json' } });
   } catch (error: any) {
-    console.error('yt-dlp error:', error);
+    console.error('Download error:', error);
     return new Response(JSON.stringify({ 
       status: 'error', 
       error: { 
         code: 'error.api.content.video.unavailable', 
-        message: error.message,
-        stdout: error.stdout,
-        stderr: error.stderr
+        message: error.message
       } 
     }), { status: 500, headers: { 'Content-Type': 'application/json' } });
   }
