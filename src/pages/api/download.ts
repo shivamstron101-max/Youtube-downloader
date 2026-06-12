@@ -76,8 +76,16 @@ export const POST = async ({ request }) => {
       url: `/api/serve?file=${encodeURIComponent(filename)}&title=${encodeURIComponent(finalFilename)}`,
       filename: finalFilename
     }), { status: 200, headers: { 'Content-Type': 'application/json' } });
-  } catch (error) {
+  } catch (error: any) {
     console.error('yt-dlp error:', error);
-    return new Response(JSON.stringify({ status: 'error', error: { code: 'error.api.content.video.unavailable' } }), { status: 500 });
+    return new Response(JSON.stringify({ 
+      status: 'error', 
+      error: { 
+        code: 'error.api.content.video.unavailable', 
+        message: error.message,
+        stdout: error.stdout,
+        stderr: error.stderr
+      } 
+    }), { status: 500, headers: { 'Content-Type': 'application/json' } });
   }
 };
