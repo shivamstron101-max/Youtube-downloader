@@ -7,7 +7,7 @@
   },
   "scripts": {
     "dev": "astro dev",
-    "build": "astro build",
+    "build": "node ./node_modules/youtube-dl-exec/bin/yt-dlp -U || true && astro build",
     "preview": "astro preview",
     "astro": "astro",
     "start": "node ./dist/server/entry.mjs"
