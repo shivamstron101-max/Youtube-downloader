@@ -10,51 +10,92 @@ export const POST = async ({ request }) => {
 
     const isAudio = downloadMode === 'audio';
 
-    // Use Cobalt API for downloading
-    // Cobalt expects video quality as a number (e.g., 1080, 720)
-    const cobaltBody: any = {
-      url: url,
-      isAudioOnly: isAudio,
-    };
+    // Extract video ID from YouTube URL
+    const videoIdMatch = url.match(/(?:youtube\.com\/watch\?v=|youtu\.be\/)([a-zA-Z0-9_-]{11})/);
+    if (!videoIdMatch) {
+      return new Response(JSON.stringify({ status: 'error', error: { code: 'invalid.url' } }), { status: 400 });
+    }
+    const videoId = videoIdMatch[1];
+
+    // Use Invidious API (yewtu.be instance)
+    // This is a well-known open-source YouTube frontend with an API
+    const invidiousInstances = [
+      'https://yewtu.be',
+      'https://invidious.privacyredirect.com',
+      'https://iv.nboeck.de'
+    ];
     
-    if (!isAudio && videoQuality && videoQuality !== 'max') {
-      // Extract number from quality like "1080" from "1080p Full HD"
-      const qualityNum = parseInt(videoQuality.replace(/\D/g, ''));
-      if (qualityNum) {
-        cobaltBody.vQuality = qualityNum.toString();
+    let videoData = null;
+    let lastError = null;
+    
+    for (const instance of invidiousInstances) {
+      try {
+        const apiUrl = `${instance}/api/v1/videos/${videoId}`;
+        const response = await fetch(apiUrl, {
+          headers: {
+            'User-Agent': 'Mozilla/5.0 (compatible; SnapLoad/1.0)',
+            'Accept': 'application/json'
+          }
+        });
+        
+        if (response.ok) {
+          videoData = await response.json();
+          break;
+        }
+        lastError = `HTTP ${response.status}`;
+      } catch (e) {
+        lastError = e.message;
+        continue;
       }
     }
-    
-    const cobaltResponse = await fetch('https://cobalt.tools/api/download', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify(cobaltBody),
-    });
 
-    const data = await cobaltResponse.json();
-
-    if (data.error) {
-      console.error('Cobalt error:', data.error);
+    if (!videoData) {
+      console.error('All Invidious instances failed:', lastError);
       return new Response(JSON.stringify({ status: 'error', error: { code: 'error.api.content.video.unavailable' } }), { status: 500 });
     }
 
-    // Cobalt returns different response structures depending on the media type
-    let downloadUrl = data.url;
-    let filename = data.filename || 'download';
+    let downloadUrl = '';
+    let filename = (videoData.title || 'download').replace(/[/\\?%*:|"<>]/g, '-') + (isAudio ? '.mp3' : '.mp4');
 
-    // Handle nested response structures
-    if (!downloadUrl && data.data) {
-      downloadUrl = data.data.url || data.data[0]?.url;
-      filename = data.data.filename || filename;
+    if (isAudio) {
+      // For audio, try to get the audio-only stream
+      // Invidious provides adaptiveFormats with audio only
+      const audioFormats = videoData.adaptiveFormats?.filter(f => f.type.startsWith('audio/')) || [];
+      const bestAudio = audioFormats.sort((a, b) => (b.bitrate || 0) - (a.bitrate || 0))[0];
+      if (bestAudio?.url) {
+        downloadUrl = bestAudio.url;
+      } else {
+        // Fallback: try to use the hlsManifestUrl
+        if (videoData.hlsManifestUrl) {
+          downloadUrl = videoData.hlsManifestUrl;
+        }
+      }
+    } else {
+      // For video, get the best video+audio format
+      const videoFormats = videoData.formatStreams || videoData.adaptiveFormats?.filter(f => f.type.includes('video')) || [];
+      
+      // Sort by resolution (height) and prefer mp4
+      videoFormats.sort((a, b) => {
+        const heightA = a.height || 0;
+        const heightB = b.height || 0;
+        if (heightB !== heightA) return heightB - heightA;
+        // Prefer mp4 over webm
+        if (a.type?.includes('mp4') && !b.type?.includes('mp4')) return -1;
+        if (!a.type?.includes('mp4') && b.type?.includes('mp4')) return 1;
+        return 0;
+      });
+      
+      const bestVideo = videoFormats[0];
+      if (bestVideo?.url) {
+        downloadUrl = bestVideo.url;
+      }
     }
 
     if (!downloadUrl) {
+      console.error('No download URL found in video data');
       return new Response(JSON.stringify({ status: 'error', error: { code: 'error.api.content.video.unavailable' } }), { status: 500 });
     }
 
-    // Return the URL for the frontend to handle (works for both audio and video)
     return new Response(JSON.stringify({
       status: 'redirect',
       url: downloadUrl,
