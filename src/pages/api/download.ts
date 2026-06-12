@@ -60,6 +60,8 @@ export const POST = async ({ request }) => {
       args.push('--merge-output-format', 'mp4');
     }
 
+    // Bypass YouTube bot detection by using android client
+    args.push('--extractor-args', 'youtube:player_client=android,web');
     args.push('--print', 'title', '--no-simulate');
 
     const { stdout } = await execFileAsync(ytDlpPath, args);
