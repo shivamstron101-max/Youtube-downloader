@@ -3,6 +3,7 @@ import { promisify } from 'util';
 import path from 'path';
 import fs from 'fs';
 import crypto from 'crypto';
+import ffmpegStatic from 'ffmpeg-static';
 
 const execFileAsync = promisify(execFile);
 
@@ -44,6 +45,7 @@ export const POST = async ({ request }) => {
       '--no-check-certificate',
       '--js-runtimes',
       'node',
+      ...(ffmpegStatic ? ['--ffmpeg-location', ffmpegStatic] : []),
       '--format',
       format,
       '-o',
