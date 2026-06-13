@@ -39,6 +39,14 @@ export const POST = async ({ request }) => {
     const extension = isAudio ? 'mp3' : 'mp4';
     const filename = `download-${uniqueId}.${extension}`;
     const outputPath = path.join(downloadsDir, filename);
+
+    let cookiesPath: string | null = null;
+    if (process.env.YOUTUBE_COOKIES) {
+      cookiesPath = path.join(downloadsDir, `cookies-${uniqueId}.txt`);
+      // Ensure the cookies are properly written (replacing literal \n with actual newlines if needed)
+      const cookiesContent = process.env.YOUTUBE_COOKIES.replace(/\\n/g, '\n');
+      fs.writeFileSync(cookiesPath, cookiesContent);
+    }
     
     const args = [
       '--no-warnings',
@@ -53,6 +61,10 @@ export const POST = async ({ request }) => {
       url
     ];
 
+    if (cookiesPath) {
+      args.push('--cookies', cookiesPath);
+    }
+
     if (isAudio) {
       args.push('--extract-audio', '--audio-format', 'mp3');
       if (audioBitrate) {
@@ -66,8 +78,16 @@ export const POST = async ({ request }) => {
     args.push('--extractor-args', 'youtube:player_client=ios,android');
     args.push('--print', 'title', '--no-simulate');
 
-    const { stdout } = await execFileAsync(ytDlpPath, args);
-    const title = stdout.trim().split('\n').pop() || 'download';
+    let title = 'download';
+    try {
+      const { stdout } = await execFileAsync(ytDlpPath, args);
+      title = stdout.trim().split('\n').pop() || 'download';
+    } finally {
+      if (cookiesPath && fs.existsSync(cookiesPath)) {
+        try { fs.unlinkSync(cookiesPath); } catch (e) {}
+      }
+    }
+
     const sanitizedTitle = title.replace(/[/\\?%*:|"<>]/g, '-');
     const finalFilename = `${sanitizedTitle}.${extension}`;
 
