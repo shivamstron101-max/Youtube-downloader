@@ -1,6 +1,6 @@
-import { NextRequest } from 'next/server';
+import type { APIRoute } from 'astro';
 
-export const POST = async (request: NextRequest) => {
+export const POST: APIRoute = async ({ request }) => {
   try {
     const { url, downloadMode } = await request.json();
 
@@ -9,9 +9,8 @@ export const POST = async (request: NextRequest) => {
     }
 
     const apiKey = process.env.RAPIDAPI_KEY;
-    const apiHost = 'youtube-media-downloader.p.rapidapi.com';
+    const apiHost = '://rapidapi.com';
 
-    // 1. Get the video details and download links from RapidAPI
     const options = {
       method: 'GET',
       headers: {
@@ -20,6 +19,7 @@ export const POST = async (request: NextRequest) => {
       }
     };
 
+    // 1. Fetch video details from RapidAPI
     const apiResponse = await fetch(`https://${apiHost}/v2/video/details?url=${url}`, options);
     const data = await apiResponse.json();
 
@@ -27,25 +27,29 @@ export const POST = async (request: NextRequest) => {
       throw new Error('Could not fetch download links from API');
     }
 
-    // 2. Select the best link based on your downloadMode (audio or video)
-    // This logic assumes you want the highest quality available
+    // 2. Select the download link based on mode
     const selectedLink = downloadMode === 'audio' 
-      ? data.audios?.items[0]?.url 
-      : data.videos?.items[0]?.url;
+      ? data.audios?.items?.[0]?.url 
+      : data.videos?.items?.[0]?.url;
 
     if (!selectedLink) {
-      throw new Error('Requested format not available for this video');
+      throw new Error('Requested format not available');
     }
 
-    // 3. Return the direct download link to your frontend
     return new Response(JSON.stringify({
       status: 'success',
       downloadUrl: selectedLink,
       title: data.title || 'video'
-    }), { status: 200 });
+    }), { 
+      status: 200,
+      headers: { 'Content-Type': 'application/json' }
+    });
 
   } catch (error: any) {
     console.error('Download Error:', error.message);
-    return new Response(JSON.stringify({ status: 'error', error: error.message }), { status: 500 });
+    return new Response(JSON.stringify({ status: 'error', error: error.message }), { 
+      status: 500,
+      headers: { 'Content-Type': 'application/json' }
+    });
   }
 };
