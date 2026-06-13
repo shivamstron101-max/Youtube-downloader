@@ -16,16 +16,26 @@ export const POST = async ({ request }) => {
       return new Response(JSON.stringify({ status: 'error', error: { code: 'missing.url' } }), { status: 400 });
     }
 
+    // Clean URL to remove tracking parameters like `si=`
+    let cleanUrl = url;
+    try {
+      const parsed = new URL(url);
+      parsed.search = '';
+      cleanUrl = parsed.toString();
+    } catch (e) {
+      // Ignore if URL is invalid, yt-dlp will handle it
+    }
+
     const isAudio = downloadMode === 'audio';
 
     let format = isAudio 
       ? 'bestaudio[ext=m4a]/bestaudio/best' 
-      : 'bestvideo[vcodec^=avc1][ext=mp4]+bestaudio[ext=m4a]/bestvideo[ext=mp4]+bestaudio[ext=m4a]/best[ext=mp4]/best';
+      : 'bestvideo[vcodec^=avc1][ext=mp4]+bestaudio[ext=m4a]/bestvideo[ext=mp4]+bestaudio[ext=m4a]/best[ext=mp4]/bestvideo+bestaudio/best';
     
     if (isAudio && audioBitrate) {
       format = `bestaudio[abr<=${audioBitrate}][ext=m4a]/bestaudio[ext=m4a]/bestaudio/best`;
     } else if (!isAudio && videoQuality && videoQuality !== 'max') {
-      format = `bestvideo[height<=${videoQuality}][vcodec^=avc1][ext=mp4]+bestaudio[ext=m4a]/bestvideo[height<=${videoQuality}][ext=mp4]+bestaudio[ext=m4a]/best[height<=${videoQuality}][ext=mp4]/best`;
+      format = `bestvideo[height<=${videoQuality}][vcodec^=avc1][ext=mp4]+bestaudio[ext=m4a]/bestvideo[height<=${videoQuality}][ext=mp4]+bestaudio[ext=m4a]/best[height<=${videoQuality}][ext=mp4]/bestvideo+bestaudio/best`;
     }
 
     const ytDlpPath = path.join(process.cwd(), 'node_modules', 'youtube-dl-exec', 'bin', 'yt-dlp');
@@ -83,7 +93,7 @@ export const POST = async ({ request }) => {
       format,
       '-o',
       outputPath,
-      url
+      cleanUrl
     ];
 
     if (cookiesPath) {
@@ -99,7 +109,8 @@ export const POST = async ({ request }) => {
       args.push('--merge-output-format', 'mp4');
     }
 
-    // Let yt-dlp use its default client to avoid bot detection issues
+    // Help bypass YouTube's bot detection on datacenter IPs
+    args.push('--extractor-args', 'youtube:player_client=tv,android,ios,web');
     args.push('--print', 'title', '--no-simulate');
 
     let title = 'download';
