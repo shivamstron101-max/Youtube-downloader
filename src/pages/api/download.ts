@@ -1,151 +1,51 @@
-import { execFile } from 'child_process';
-import { promisify } from 'util';
-import path from 'path';
-import fs from 'fs';
-import crypto from 'crypto';
-import ffmpegStatic from 'ffmpeg-static';
+import { NextRequest } from 'next/server';
 
-const execFileAsync = promisify(execFile);
-
-export const POST = async ({ request }) => {
+export const POST = async (request: NextRequest) => {
   try {
-    const body = await request.json();
-    const { url, downloadMode, videoQuality, audioBitrate } = body;
+    const { url, downloadMode } = await request.json();
 
     if (!url) {
-      return new Response(JSON.stringify({ status: 'error', error: { code: 'missing.url' } }), { status: 400 });
+      return new Response(JSON.stringify({ status: 'error', error: 'Missing URL' }), { status: 400 });
     }
 
-    // Clean URL to remove tracking parameters like `si=`
-    let cleanUrl = url;
-    try {
-      const parsed = new URL(url);
-      parsed.search = '';
-      cleanUrl = parsed.toString();
-    } catch (e) {
-      // Ignore if URL is invalid, yt-dlp will handle it
-    }
+    const apiKey = process.env.RAPIDAPI_KEY;
+    const apiHost = 'youtube-media-downloader.p.rapidapi.com';
 
-    const isAudio = downloadMode === 'audio';
-
-    let format = isAudio 
-      ? 'bestaudio[ext=m4a]/bestaudio/best' 
-      : 'bestvideo[vcodec^=avc1][ext=mp4]+bestaudio[ext=m4a]/bestvideo[ext=mp4]+bestaudio[ext=m4a]/best[ext=mp4]/bestvideo+bestaudio/best';
-    
-    if (isAudio && audioBitrate) {
-      format = `bestaudio[abr<=${audioBitrate}][ext=m4a]/bestaudio[ext=m4a]/bestaudio/best`;
-    } else if (!isAudio && videoQuality && videoQuality !== 'max') {
-      format = `bestvideo[height<=${videoQuality}][vcodec^=avc1][ext=mp4]+bestaudio[ext=m4a]/bestvideo[height<=${videoQuality}][ext=mp4]+bestaudio[ext=m4a]/best[height<=${videoQuality}][ext=mp4]/bestvideo+bestaudio/best`;
-    }
-
-    const ytDlpPath = path.join(process.cwd(), 'node_modules', 'youtube-dl-exec', 'bin', 'yt-dlp');
-    const downloadsDir = path.join(process.cwd(), 'public', 'downloads');
-    
-    if (!fs.existsSync(downloadsDir)) {
-      fs.mkdirSync(downloadsDir, { recursive: true });
-    }
-
-    const uniqueId = crypto.randomBytes(8).toString('hex');
-    const extension = isAudio ? 'mp3' : 'mp4';
-    const filename = `download-${uniqueId}.${extension}`;
-    const outputPath = path.join(downloadsDir, filename);
-
-    let cookiesPath: string | null = null;
-    if (process.env.YOUTUBE_COOKIES) {
-      cookiesPath = path.join(downloadsDir, `cookies-${uniqueId}.txt`);
-      let cookiesContent = process.env.YOUTUBE_COOKIES;
-      
-      if (cookiesContent.trim().startsWith('[')) {
-        try {
-          const jsonCookies = JSON.parse(cookiesContent);
-          let netscapeCookies = '# Netscape HTTP Cookie File\n';
-          for (const cookie of jsonCookies) {
-            const domain = cookie.domain || '';
-            const domainFlag = domain.startsWith('.') ? 'TRUE' : 'FALSE';
-            const cookiePath = cookie.path || '/';
-            const secure = cookie.secure ? 'TRUE' : 'FALSE';
-            const expiration = cookie.expirationDate ? Math.round(cookie.expirationDate) : 0;
-            const name = cookie.name;
-            const value = cookie.value;
-            netscapeCookies += `${domain}\t${domainFlag}\t${cookiePath}\t${secure}\t${expiration}\t${name}\t${value}\n`;
-          }
-          cookiesContent = netscapeCookies;
-        } catch (e) {
-          console.error("Failed to parse JSON cookies");
-        }
-      } else {
-        cookiesContent = cookiesContent.replace(/\\n/g, '\n');
-        if (!cookiesContent.includes('# Netscape HTTP Cookie File')) {
-          cookiesContent = '# Netscape HTTP Cookie File\n\n' + cookiesContent;
-        }
+    // 1. Get the video details and download links from RapidAPI
+    const options = {
+      method: 'GET',
+      headers: {
+        'x-rapidapi-key': apiKey || '',
+        'x-rapidapi-host': apiHost
       }
-      
-      fs.writeFileSync(cookiesPath, cookiesContent);
-    }
-    
-    const args = [
-      '--no-warnings',
-      '--no-check-certificate',
-      '--js-runtimes',
-      'node',
-      ...(ffmpegStatic ? ['--ffmpeg-location', ffmpegStatic] : []),
-      '--format',
-      format,
-      '-o',
-      outputPath,
-      cleanUrl
-    ];
+    };
 
-    if (cookiesPath) {
-      args.push('--cookies', cookiesPath);
+    const apiResponse = await fetch(`https://${apiHost}/v2/video/details?url=${url}`, options);
+    const data = await apiResponse.json();
+
+    if (!data || !data.videos) {
+      throw new Error('Could not fetch download links from API');
     }
 
-    if (isAudio) {
-      args.push('--extract-audio', '--audio-format', 'mp3');
-      if (audioBitrate) {
-        args.push('--audio-quality', `${audioBitrate}K`);
-      }
-    } else {
-      args.push('--merge-output-format', 'mp4');
+    // 2. Select the best link based on your downloadMode (audio or video)
+    // This logic assumes you want the highest quality available
+    const selectedLink = downloadMode === 'audio' 
+      ? data.audios?.items[0]?.url 
+      : data.videos?.items[0]?.url;
+
+    if (!selectedLink) {
+      throw new Error('Requested format not available for this video');
     }
 
-    // Help bypass YouTube's bot detection on datacenter IPs
-    args.push('--extractor-args', 'youtube:player_client=tv,android,ios,web');
-    
-    if (process.env.YOUTUBE_PROXY) {
-      args.push('--proxy', process.env.YOUTUBE_PROXY);
-    }
-    
-    args.push('--print', 'title', '--no-simulate');
-
-    let title = 'download';
-    try {
-      const { stdout } = await execFileAsync(ytDlpPath, args);
-      title = stdout.trim().split('\n').pop() || 'download';
-    } finally {
-      if (cookiesPath && fs.existsSync(cookiesPath)) {
-        try { fs.unlinkSync(cookiesPath); } catch (e) {}
-      }
-    }
-
-    const sanitizedTitle = title.replace(/[/\\?%*:|"<>]/g, '-');
-    const finalFilename = `${sanitizedTitle}.${extension}`;
-
+    // 3. Return the direct download link to your frontend
     return new Response(JSON.stringify({
-      status: 'tunnel',
-      url: `/api/serve?file=${encodeURIComponent(filename)}&title=${encodeURIComponent(finalFilename)}`,
-      filename: finalFilename
-    }), { status: 200, headers: { 'Content-Type': 'application/json' } });
+      status: 'success',
+      downloadUrl: selectedLink,
+      title: data.title || 'video'
+    }), { status: 200 });
+
   } catch (error: any) {
-    console.error('yt-dlp error:', error);
-    return new Response(JSON.stringify({ 
-      status: 'error', 
-      error: { 
-        code: 'error.api.content.video.unavailable', 
-        message: error.message,
-        stdout: error.stdout,
-        stderr: error.stderr
-      } 
-    }), { status: 500, headers: { 'Content-Type': 'application/json' } });
+    console.error('Download Error:', error.message);
+    return new Response(JSON.stringify({ status: 'error', error: error.message }), { status: 500 });
   }
 };
