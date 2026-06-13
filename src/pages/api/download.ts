@@ -43,8 +43,33 @@ export const POST = async ({ request }) => {
     let cookiesPath: string | null = null;
     if (process.env.YOUTUBE_COOKIES) {
       cookiesPath = path.join(downloadsDir, `cookies-${uniqueId}.txt`);
-      // Ensure the cookies are properly written (replacing literal \n with actual newlines if needed)
-      const cookiesContent = process.env.YOUTUBE_COOKIES.replace(/\\n/g, '\n');
+      let cookiesContent = process.env.YOUTUBE_COOKIES;
+      
+      if (cookiesContent.trim().startsWith('[')) {
+        try {
+          const jsonCookies = JSON.parse(cookiesContent);
+          let netscapeCookies = '# Netscape HTTP Cookie File\n';
+          for (const cookie of jsonCookies) {
+            const domain = cookie.domain || '';
+            const domainFlag = domain.startsWith('.') ? 'TRUE' : 'FALSE';
+            const cookiePath = cookie.path || '/';
+            const secure = cookie.secure ? 'TRUE' : 'FALSE';
+            const expiration = cookie.expirationDate ? Math.round(cookie.expirationDate) : 0;
+            const name = cookie.name;
+            const value = cookie.value;
+            netscapeCookies += `${domain}\t${domainFlag}\t${cookiePath}\t${secure}\t${expiration}\t${name}\t${value}\n`;
+          }
+          cookiesContent = netscapeCookies;
+        } catch (e) {
+          console.error("Failed to parse JSON cookies");
+        }
+      } else {
+        cookiesContent = cookiesContent.replace(/\\n/g, '\n');
+        if (!cookiesContent.includes('# Netscape HTTP Cookie File')) {
+          cookiesContent = '# Netscape HTTP Cookie File\n\n' + cookiesContent;
+        }
+      }
+      
       fs.writeFileSync(cookiesPath, cookiesContent);
     }
     
@@ -74,8 +99,7 @@ export const POST = async ({ request }) => {
       args.push('--merge-output-format', 'mp4');
     }
 
-    // Bypass YouTube bot detection by using ios/android client
-    args.push('--extractor-args', 'youtube:player_client=ios,android');
+    // Let yt-dlp use its default client to avoid bot detection issues
     args.push('--print', 'title', '--no-simulate');
 
     let title = 'download';
