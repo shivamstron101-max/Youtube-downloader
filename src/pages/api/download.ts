@@ -111,6 +111,11 @@ export const POST = async ({ request }) => {
 
     // Help bypass YouTube's bot detection on datacenter IPs
     args.push('--extractor-args', 'youtube:player_client=tv,android,ios,web');
+    
+    if (process.env.YOUTUBE_PROXY) {
+      args.push('--proxy', process.env.YOUTUBE_PROXY);
+    }
+    
     args.push('--print', 'title', '--no-simulate');
 
     let title = 'download';
