@@ -23,6 +23,9 @@ export const POST: APIRoute = async ({ request }) => {
     });
 
     if (!rapidResponse.ok) {
+      if (rapidResponse.status === 403) {
+        throw new Error('The API service could not download this video. It is likely blocked, copyright-protected (like VEVO music videos), or age-restricted.');
+      }
       throw new Error(`API returned ${rapidResponse.status}`);
     }
 
